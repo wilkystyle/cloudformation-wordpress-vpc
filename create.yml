@@ -4,10 +4,15 @@
 #  ansible-playbook create.yml -i aws
 #
 
-- hosts: localhost
+- hosts: local
   gather_facts: False
   vars_prompt:
     - name: "key_name"
       prompt: "EC2 access key"
+    - name: "db_user"
+      prompt: "Enter the MySQL database username"
+    - name: "db_password"
+      prompt: "Enter the password for the MySQL database user"
+      private: yes
   roles:
-    - role: wordpress-sample
+    - role: wordpress-cloudformation
