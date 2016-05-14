@@ -5,7 +5,7 @@
     stack_name: "{{ stack_name }}"
     state: present
     region: "{{ stack_region }}"
-    template: "../files/wordpress-sample.template"
+    template: "wordpress-sample/files/wordpress-sample.template"
     template_parameters:
       KeyName: "{{ key_name }}"
       InstanceType: "{{ instance_type }}"
