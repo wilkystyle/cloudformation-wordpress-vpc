@@ -1,0 +1,10 @@
+---
+
+#
+#  ansible-playbook create.yml -i aws
+#
+
+- hosts: localhost
+  gather_facts: False
+  roles:
+    - role: wordpress-sample
