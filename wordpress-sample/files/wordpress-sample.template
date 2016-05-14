@@ -1,0 +1,107 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "A Cloudformation template to automate the setup of a basic WordPress site.",
+    "Resources": {
+        "VPC": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": { "CidrBlock": "10.0.0.0/24" }
+        },
+        "Subnet": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": { "Ref": "VPC" },
+                "CidrBlock": "10.0.0.0/24",
+                "AvailabilityZone": { "Fn::Select": [ "0", {"Fn::GetAZs": {"Ref": "AWS::Region"}} ]},
+            }
+        },
+        "Gateway": {
+            "Type": "AWS::EC2::InternetGateway",
+        },
+        "GatewayAttachment": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "VpcId": { "Ref": "VPC" },
+                "InternetGatewayId": { "Ref": "Gateway" }
+            }
+        },
+        "RouteTable": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {"Ref": "VPC"},
+            }
+        },
+        "PublicRoute": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": { "Ref": "RouteTable" },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": { "Ref": "Gateway" }
+            }
+        },
+        "SubnetRouteTableAssociation": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "SubnetId": { "Ref": "Subnet" },
+            "RouteTableId": { "Ref": "RouteTable" }
+        }
+    },
+    "LoadBalancerSecurityGroup": {
+        "Type": "AWS::EC2::SecurityGroup",
+        "Properties": {
+            "GroupDescription": "Security group to HTTP and SSH access",
+            "VpcId": { "Ref": "VPC" },
+            "SecurityGroupIngress": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": "80",
+                    "ToPort": "80",
+                    "CidrIp": "0.0.0.0/0"
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": "22",
+                    "ToPort": "22",
+                    "CidrIp": "0.0.0.0/0"
+                }
+            ],
+            "SecurityGroupEgress": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": "80",
+                    "ToPort": "80",
+                    "CidrIp": "0.0.0.0/0"
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": "22",
+                    "ToPort": "22",
+                    "CidrIp": "0.0.0.0/0"
+                }
+            ]
+        }
+    },
+    "LoadBalancer": {
+        "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+        "Properties": {
+            "SecurityGroups": [{ "Ref": "LoadBalancerSecurityGroup" }],
+            "Subnets": [{ "Ref": "Subnet" }],
+            "Listeners": [{
+                "LoadBalancerPort": "80",
+                "InstancePort": "80",
+                "Protocol": "HTTP"
+            }],
+            "HealthCheck": {
+                "Target": "HTTP:80/wp-admin/install.php",
+                "HealthyThreshold": "3",
+                "UnhealthyThreshold": "5",
+                "Interval": "30",
+                "Timeout": "25"
+            }
+        }
+    }
+},
+"Outputs": {
+    "URL": {
+        "Description": "The load balancer URL for the VPC we just created",
+        "Value":  { "Fn::Join": [ "", [ "http://", { "Fn::GetAtt": [ "LoadBalancer", "DNSName" ]}]]}
+    }
+}

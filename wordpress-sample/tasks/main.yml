@@ -1,0 +1,8 @@
+---
+
+- name: Execute the Cloudformation template
+  cloudformation:
+    stack_name="{{ stack_name }}"
+    state=present
+    region="{{ stack_region }}"
+    template="../files/wordpress-sample.template"
