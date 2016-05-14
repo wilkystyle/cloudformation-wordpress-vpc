@@ -42,66 +42,77 @@
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "SubnetId": { "Ref": "Subnet" },
             "RouteTableId": { "Ref": "RouteTable" }
-        }
-    },
-    "LoadBalancerSecurityGroup": {
-        "Type": "AWS::EC2::SecurityGroup",
-        "Properties": {
-            "GroupDescription": "Security group to HTTP and SSH access",
-            "VpcId": { "Ref": "VPC" },
-            "SecurityGroupIngress": [
-                {
-                    "IpProtocol": "tcp",
-                    "FromPort": "80",
-                    "ToPort": "80",
-                    "CidrIp": "0.0.0.0/0"
-                },
-                {
-                    "IpProtocol": "tcp",
-                    "FromPort": "22",
-                    "ToPort": "22",
-                    "CidrIp": "0.0.0.0/0"
+        },
+        "LoadBalancerSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Security group to HTTP and SSH access",
+                "VpcId": { "Ref": "VPC" },
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ],
+                "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "80",
+                        "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        },
+        "LoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "Instances": [{ "Ref": "WebApp" }],
+                "SecurityGroups": [{ "Ref": "LoadBalancerSecurityGroup" }],
+                "Subnets": [{ "Ref": "Subnet" }],
+                "Listeners": [{
+                    "LoadBalancerPort": "80",
+                    "InstancePort": "80",
+                    "Protocol": "HTTP"
+                }],
+                "HealthCheck": {
+                    "Target": "HTTP:80/wp-admin/install.php",
+                    "HealthyThreshold": "3",
+                    "UnhealthyThreshold": "5",
+                    "Interval": "30",
+                    "Timeout": "25"
                 }
-            ],
-            "SecurityGroupEgress": [
-                {
-                    "IpProtocol": "tcp",
-                    "FromPort": "80",
-                    "ToPort": "80",
-                    "CidrIp": "0.0.0.0/0"
-                },
-                {
-                    "IpProtocol": "tcp",
-                    "FromPort": "22",
-                    "ToPort": "22",
-                    "CidrIp": "0.0.0.0/0"
-                }
-            ]
-        }
-    },
-    "LoadBalancer": {
-        "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
-        "Properties": {
-            "SecurityGroups": [{ "Ref": "LoadBalancerSecurityGroup" }],
-            "Subnets": [{ "Ref": "Subnet" }],
-            "Listeners": [{
-                "LoadBalancerPort": "80",
-                "InstancePort": "80",
-                "Protocol": "HTTP"
-            }],
-            "HealthCheck": {
-                "Target": "HTTP:80/wp-admin/install.php",
-                "HealthyThreshold": "3",
-                "UnhealthyThreshold": "5",
-                "Interval": "30",
-                "Timeout": "25"
+            }
+        },
+        "WebApp": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": "ami-2051294a",
+                "SecurityGroupIds": [{ "Ref": "InstanceSecurityGroup" }],
+                "SubnetId": { "Ref": "Subnet" },
+                "InstanceType": { "Ref": "InstanceType" },
+                "KeyName": { "Ref": "KeyName" },
             }
         }
-    }
-},
-"Outputs": {
-    "URL": {
-        "Description": "The load balancer URL for the VPC we just created",
-        "Value":  { "Fn::Join": [ "", [ "http://", { "Fn::GetAtt": [ "LoadBalancer", "DNSName" ]}]]}
+    },
+    "Outputs": {
+        "URL": {
+            "Description": "The load balancer URL for the VPC we just created",
+            "Value":  { "Fn::Join": [ "", [ "http://", { "Fn::GetAtt": [ "LoadBalancer", "DNSName" ]}]]}
+        }
     }
 }
