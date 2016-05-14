@@ -93,7 +93,7 @@
         "WebApp": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
-                "ImageId": "ami-2051294a",
+                "ImageId": "ami-fce3c696",
                 "InstanceType": { "Ref": "InstanceType" },
                 "KeyName": { "Ref": "KeyName" },
                 "SecurityGroupIds" : [ { "Ref" : "InstanceSecurityGroup" } ],
