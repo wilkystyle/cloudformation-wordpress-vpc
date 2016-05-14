@@ -6,5 +6,8 @@
 
 - hosts: localhost
   gather_facts: False
+  vars_prompt:
+    - name: "key_name"
+      prompt: "EC2 access key"
   roles:
     - role: wordpress-sample
