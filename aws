@@ -1,2 +1,6 @@
 [local]
 localhost ansible_connection=local
+
+[local:vars]
+stack_name="wordpress-sample-cloudformation"
+stack_region="us-east-1"
