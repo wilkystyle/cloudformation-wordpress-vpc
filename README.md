@@ -17,6 +17,12 @@ First, make sure that you have exported your AWS credentials:
     $ export AWS_ACCESS_KEY_ID="[YOUR ACCESS KEY]"
     $ export AWS_SECRET_ACCESS_KEY="[YOUR SECRET ACCESS KEY]"
 
-Then, run the Ansible playbook to create the stack:
+Next, run the Ansible playbook to create the stack and the local `wordpress` inventory file:
 
     $ ansible-playbook create.yml -i aws
+
+You will be prompted for the EC2 key pair ID that you wish to use for access to the EC2 instance after it is created. This must be the ID of the keypair you will use in the command below.
+
+Finally, run the Ansible playbook to provision the WordPress site, supplying the key file for EC2 access:
+
+    $ ansible-playbook provision.yml -i wordpress --private-key=/path/to/ec2/key.pem
