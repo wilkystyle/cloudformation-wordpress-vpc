@@ -1,0 +1,21 @@
+---
+
+- debug: msg="Executing CloudFormation template with keypair id {{ key_name }}"
+
+- name: Execute the Cloudformation template
+  cloudformation:
+    disable_rollback: true
+    region: "{{ stack_region }}"
+    stack_name: "{{ stack_name }}"
+    state: present
+    template: "wordpress-cloudformation/files/wordpress-sample.template"
+    template_parameters:
+      KeyName: "{{ key_name }}"
+      InstanceType: "{{ instance_type }}"
+  register: cloudformation_output
+
+- shell: msg="CloudFormation output is {{ cloudformation_output.stack_outputs.IP }}"
+
+- set_fact: ec2_instance_ip="{{ cloudformation_output.stack_outputs.IP }}"
+
+- template: src="wordpress_inventory.j2" dest="{{ playbook_dir }}/wordpress"

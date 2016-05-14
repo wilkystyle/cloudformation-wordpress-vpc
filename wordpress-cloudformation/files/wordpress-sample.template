@@ -4,7 +4,7 @@
     "Parameters": {
         "KeyName": {
             "Description" : "EC2 key pair for access to instance",
-            "Type": "String"
+            "Type": "AWS::EC2::KeyPair::KeyName"
         },
         "InstanceType" : {
             "Description" : "WebServer EC2 instance type",

@@ -1,0 +1,10 @@
+---
+
+#
+#  ansible-playbook create.yml -i aws
+#
+
+- hosts: ec2-instance
+  gather_facts: True
+  roles:
+    - role: wordpress-site

@@ -1,0 +1,8 @@
+[ec2-instance]
+{{ ec2_instance_ip }}
+
+[ec2-instance:vars]
+ansible_ssh_user="ubuntu"
+db_user="{{ db_user }}"
+db_password="{{ db_password }}"
+db_name="wordpress"
