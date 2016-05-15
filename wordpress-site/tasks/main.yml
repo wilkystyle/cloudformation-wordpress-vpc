@@ -4,6 +4,7 @@
   with_items:
     - "mysql-server"
     - "php5-mysql"
+    - "php5-fpm"
     - "python-mysqldb"
     - "nginx"
   sudo: yes
@@ -62,7 +63,7 @@
 - name: Start php-fpm Service
   sudo: yes
 
-  service: name=php-fpm state=started enabled=yes
+  service: name=php5-fpm state=started enabled=yes
 
 - name: Copy nginx configuration for wordpress
   template: src=default.conf.j2 dest=/etc/nginx/conf.d/default.conf
